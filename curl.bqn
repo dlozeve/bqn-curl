@@ -14,8 +14,8 @@
   slistFreeAll,
   fopen,
   fclose,
-  options,
-  info
+  curlOptions,
+  curlInfo
 ⟩←•Import"ffi.bqn"
 ⟨RandID⟩←•Import"utils.bqn"
 
@@ -30,21 +30,21 @@ headers 𝕊 url:
 
   session←EasyInit⟨⟩
 
-  ruseragent←EasySetoptStr⟨session,options.useragent,"curl/bqn"∾@⟩
+  ruseragent←EasySetoptStr⟨session,curlOptions.useragent,"curl/bqn"∾@⟩
   ("Error setting user agent: "∾•Fmt ruseragent)!ruseragent=0
-  rurl←EasySetoptStr⟨session,options.url,url∾@⟩
+  rurl←EasySetoptStr⟨session,curlOptions.url,url∾@⟩
   ("Error setting URL: "∾•Fmt rurl)!rurl=0
-  rfile←EasySetoptPtr⟨session,options.writedata,filePtr⟩
+  rfile←EasySetoptPtr⟨session,curlOptions.writedata,filePtr⟩
   ("Error setting file target: "∾•Fmt rfile)!rfile=0
-  rheaderfile←EasySetoptPtr⟨session,options.headerdata,headerFilePtr⟩
+  rheaderfile←EasySetoptPtr⟨session,curlOptions.headerdata,headerFilePtr⟩
   ("Error setting header file target: "∾•Fmt rheaderfile)!rheaderfile=0
-  rredirect←EasySetoptLong⟨session,options.followlocation,1⟩
+  rredirect←EasySetoptLong⟨session,curlOptions.followlocation,1⟩
   ("Error setting redirect option: "∾•Fmt rredirect)!rredirect=0
-  # EasySetoptLong⟨session,options.header,1⟩
-  # EasySetoptLong⟨session,options.verbose,1⟩
+  # EasySetoptLong⟨session,curlOptions.header,1⟩
+  # EasySetoptLong⟨session,curlOptions.verbose,1⟩
 
   slist←(8↑0){SlistAppend⟨𝕩,𝕨∾@⟩}´headers
-  rheaders←EasySetoptPtr⟨session,options.httpHeader,slist⟩
+  rheaders←EasySetoptPtr⟨session,curlOptions.httpHeader,slist⟩
   ("Error setting headers: "∾•Fmt rheaders)!rheaders=0
 
   rperform←EasyPerform⟨session⟩
@@ -52,10 +52,10 @@ headers 𝕊 url:
 
   SlistFreeAll slist
 
-  rcode‿⟨code⟩←EasyGetinfoLong⟨session,info.responseCode,⟨0⟩⟩
+  rcode‿⟨code⟩←EasyGetinfoLong⟨session,curlInfo.responseCode,⟨0⟩⟩
   ("Error retrieving response code: "∾•Fmt rcode)!rcode=0
   # ("Request failed with status code "∾•Fmt code)!2=⌊code÷100
-  rtime‿⟨time⟩←EasyGetinfoDouble⟨session,info.totalTime,⟨0.0⟩⟩
+  rtime‿⟨time⟩←EasyGetinfoDouble⟨session,curlInfo.totalTime,⟨0.0⟩⟩
   ("Error retrieving request time: "∾•Fmt rtime)!rtime=0
 
   Fclose filePtr
@@ -85,27 +85,27 @@ headers 𝕊 url‿data:
 
   session←EasyInit⟨⟩
 
-  ruseragent←EasySetoptStr⟨session,options.useragent,"curl/bqn"∾@⟩
+  ruseragent←EasySetoptStr⟨session,curlOptions.useragent,"curl/bqn"∾@⟩
   ("Error setting user agent: "∾•Fmt ruseragent)!ruseragent=0
-  rurl←EasySetoptStr⟨session,options.url,url∾@⟩
+  rurl←EasySetoptStr⟨session,curlOptions.url,url∾@⟩
   ("Error setting URL: "∾•Fmt rurl)!rurl=0
-  rfile←EasySetoptPtr⟨session,options.writedata,filePtr⟩
+  rfile←EasySetoptPtr⟨session,curlOptions.writedata,filePtr⟩
   ("Error setting file target: "∾•Fmt rfile)!rfile=0
-  rheaderfile←EasySetoptPtr⟨session,options.headerdata,headerFilePtr⟩
+  rheaderfile←EasySetoptPtr⟨session,curlOptions.headerdata,headerFilePtr⟩
   ("Error setting header file target: "∾•Fmt rheaderfile)!rheaderfile=0
-  rredirect←EasySetoptLong⟨session,options.followlocation,1⟩
+  rredirect←EasySetoptLong⟨session,curlOptions.followlocation,1⟩
   ("Error setting redirect option: "∾•Fmt rredirect)!rredirect=0
-  rpost←EasySetoptLong⟨session,options.post,1⟩
+  rpost←EasySetoptLong⟨session,curlOptions.post,1⟩
   ("Error setting up POST request: "∾•Fmt rpost)!rpost=0
-  rpostfields←EasySetoptStr⟨session,options.postfields,data⟩
+  rpostfields←EasySetoptStr⟨session,curlOptions.postfields,data⟩
   ("Error setting POST data: "∾•Fmt rpostfields)!rpostfields=0
-  rpostfieldsize←EasySetoptLong⟨session,options.postfieldsize,≠data⟩
+  rpostfieldsize←EasySetoptLong⟨session,curlOptions.postfieldsize,≠data⟩
   ("Error setting POST data size: "∾•Fmt rpostfieldsize)!rpostfieldsize=0
-  # EasySetoptLong⟨session,options.header,1⟩
-  # EasySetoptLong⟨session,options.verbose,1⟩
+  # EasySetoptLong⟨session,curlOptions.header,1⟩
+  # EasySetoptLong⟨session,curlOptions.verbose,1⟩
 
   slist←(8↑0){SlistAppend⟨𝕩,𝕨∾@⟩}´headers
-  rheaders←EasySetoptPtr⟨session,options.httpHeader,slist⟩
+  rheaders←EasySetoptPtr⟨session,curlOptions.httpHeader,slist⟩
   ("Error setting headers: "∾•Fmt rheaders)!rheaders=0
 
   rperform←EasyPerform⟨session⟩
@@ -113,10 +113,10 @@ headers 𝕊 url‿data:
 
   SlistFreeAll slist
 
-  rcode‿⟨code⟩←EasyGetinfoLong⟨session,info.responseCode,⟨0⟩⟩
+  rcode‿⟨code⟩←EasyGetinfoLong⟨session,curlInfo.responseCode,⟨0⟩⟩
   ("Error retrieving response code: "∾•Fmt rcode)!rcode=0
   # ("Request failed with status code "∾•Fmt code)!2=⌊code÷100
-  rtime‿⟨time⟩←EasyGetinfoDouble⟨session,info.totalTime,⟨0.0⟩⟩
+  rtime‿⟨time⟩←EasyGetinfoDouble⟨session,curlInfo.totalTime,⟨0.0⟩⟩
   ("Error retrieving request time: "∾•Fmt rtime)!rtime=0
 
   Fclose filePtr

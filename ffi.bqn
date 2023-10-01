@@ -12,8 +12,8 @@
   slistFreeAll,
   fopen,
   fclose,
-  options,
-  info
+  curlOptions,
+  curlInfo
 ⟩⇐
 
 ⟨Hex2Num⟩←•Import"utils.bqn"
@@ -45,7 +45,7 @@ slistFreeAll←CurlFFI ""‿"curl_slist_free_all"‿">*:i8"
 fopen←@•FFI "*:i8"‿"fopen"‿"*u8:c8"‿"*u8:c8"
 fclose←@•FFI ""‿"fclose"‿">*:i8"
 
-options←{
+curlOptions←{
   strOffset←10000
   slistOffset←10000
   ptrOffset←10000
@@ -77,8 +77,7 @@ options←{
   httpHeader⇐slistOffset+23  # HTTP headers as a list of strings
 }
 
-
-info←{
+curlInfo←{
   strOffset←Hex2Num"100000"
   longOffset←Hex2Num"200000"
   doubleOffset←Hex2Num"300000"
