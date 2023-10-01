@@ -2,6 +2,10 @@
 
 FFI bindings to [[https://curl.se/libcurl/][libcurl]] for [[https://mlochbaum.github.io/BQN/][BQN]].
 
+** Configuration
+
+Set the location of the =libcurl.so= library in [[./config.bqn][config.bqn]].
+
 ** Making requests
 
 Only GET and POST requests are implemented at this time.
