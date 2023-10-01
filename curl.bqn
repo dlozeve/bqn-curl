@@ -64,7 +64,10 @@ headers 𝕊 url:
   responseHeaders←•file.Chars headerFilename
 
   •file.Remove filename
+  •file.Remove headerFilename
+
   EasyCleanup session
+
   {
     code⇐code,
     time⇐time,
@@ -72,7 +75,6 @@ headers 𝕊 url:
     content⇐content,
   }
 }
-
 
 Post←{
 𝕊 url‿data: ⟨⟩ 𝕊 url‿data ;
@@ -125,7 +127,10 @@ headers 𝕊 url‿data:
   responseHeaders←•file.Chars headerFilename
 
   •file.Remove filename
+  •file.Remove headerFilename
+
   EasyCleanup session
+
   {
     code⇐code,
     time⇐time,
