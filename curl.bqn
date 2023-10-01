@@ -19,16 +19,12 @@
 ⟩←•Import"ffi.bqn"
 ⟨RandID⟩←•Import"utils.bqn"
 
-Get←{
-𝕊 url: ⟨⟩ 𝕊 url ;
-headers 𝕊 url:
+PrepareRequest←{session 𝕊 url‿headers:
   id←RandID 32
   filename←"/tmp/bqncurl."∾id
   filePtr←Fopen⟨filename∾@,"w+"⟩
   headerFilename←"/tmp/bqncurl.header."∾id
   headerFilePtr←Fopen⟨headerFilename∾@,"w+"⟩
-
-  session←EasyInit⟨⟩
 
   ruseragent←EasySetoptStr⟨session,curlOptions.useragent,"curl/bqn"∾@⟩
   ("Error setting user agent: "∾•Fmt ruseragent)!ruseragent=0
@@ -47,26 +43,25 @@ headers 𝕊 url:
   rheaders←EasySetoptPtr⟨session,curlOptions.httpHeader,slist⟩
   ("Error setting headers: "∾•Fmt rheaders)!rheaders=0
 
-  rperform←EasyPerform⟨session⟩
-  ("Error performing request: "∾•Fmt rperform)!rperform=0
+  slist‿filename‿filePtr‿headerFilename‿headerFilePtr
+}
 
+ReadResponse←{session 𝕊 slist‿filename‿filePtr‿headerFilename‿headerFilePtr:
   SlistFreeAll slist
 
   rcode‿⟨code⟩←EasyGetinfoLong⟨session,curlInfo.responseCode,⟨0⟩⟩
   ("Error retrieving response code: "∾•Fmt rcode)!rcode=0
-  # ("Request failed with status code "∾•Fmt code)!2=⌊code÷100
   rtime‿⟨time⟩←EasyGetinfoDouble⟨session,curlInfo.totalTime,⟨0.0⟩⟩
   ("Error retrieving request time: "∾•Fmt rtime)!rtime=0
 
   Fclose filePtr
   Fclose headerFilePtr
+
   content←•file.Bytes filename
   responseHeaders←•file.Chars headerFilename
 
   •file.Remove filename
   •file.Remove headerFilename
-
-  EasyCleanup session
 
   {
     code⇐code,
@@ -76,65 +71,36 @@ headers 𝕊 url:
   }
 }
 
+Get←{
+𝕊 url: ⟨⟩ 𝕊 url ;
+headers 𝕊 url:
+  session←EasyInit⟨⟩
+  d←session PrepareRequest url‿headers
+
+  rperform←EasyPerform⟨session⟩
+  ("Error performing request: "∾•Fmt rperform)!rperform=0
+
+  response←session ReadResponse d
+  EasyCleanup session
+  response
+}
+
 Post←{
 𝕊 url‿data: ⟨⟩ 𝕊 url‿data ;
 headers 𝕊 url‿data:
-  id←RandID 32
-  filename←"/tmp/bqncurl."∾id
-  filePtr←Fopen⟨filename∾@,"w+"⟩
-  headerFilename←"/tmp/bqncurl.header."∾id
-  headerFilePtr←Fopen⟨headerFilename∾@,"w+"⟩
-
   session←EasyInit⟨⟩
-
-  ruseragent←EasySetoptStr⟨session,curlOptions.useragent,"curl/bqn"∾@⟩
-  ("Error setting user agent: "∾•Fmt ruseragent)!ruseragent=0
-  rurl←EasySetoptStr⟨session,curlOptions.url,url∾@⟩
-  ("Error setting URL: "∾•Fmt rurl)!rurl=0
-  rfile←EasySetoptPtr⟨session,curlOptions.writedata,filePtr⟩
-  ("Error setting file target: "∾•Fmt rfile)!rfile=0
-  rheaderfile←EasySetoptPtr⟨session,curlOptions.headerdata,headerFilePtr⟩
-  ("Error setting header file target: "∾•Fmt rheaderfile)!rheaderfile=0
-  rredirect←EasySetoptLong⟨session,curlOptions.followlocation,1⟩
-  ("Error setting redirect option: "∾•Fmt rredirect)!rredirect=0
+  d←session PrepareRequest url‿headers
   rpost←EasySetoptLong⟨session,curlOptions.post,1⟩
   ("Error setting up POST request: "∾•Fmt rpost)!rpost=0
   rpostfields←EasySetoptStr⟨session,curlOptions.postfields,data⟩
   ("Error setting POST data: "∾•Fmt rpostfields)!rpostfields=0
   rpostfieldsize←EasySetoptLong⟨session,curlOptions.postfieldsize,≠data⟩
   ("Error setting POST data size: "∾•Fmt rpostfieldsize)!rpostfieldsize=0
-  # EasySetoptLong⟨session,curlOptions.header,1⟩
-  # EasySetoptLong⟨session,curlOptions.verbose,1⟩
-
-  slist←(8↑0){SlistAppend⟨𝕩,𝕨∾@⟩}´headers
-  rheaders←EasySetoptPtr⟨session,curlOptions.httpHeader,slist⟩
-  ("Error setting headers: "∾•Fmt rheaders)!rheaders=0
 
   rperform←EasyPerform⟨session⟩
   ("Error performing request: "∾•Fmt rperform)!rperform=0
 
-  SlistFreeAll slist
-
-  rcode‿⟨code⟩←EasyGetinfoLong⟨session,curlInfo.responseCode,⟨0⟩⟩
-  ("Error retrieving response code: "∾•Fmt rcode)!rcode=0
-  # ("Request failed with status code "∾•Fmt code)!2=⌊code÷100
-  rtime‿⟨time⟩←EasyGetinfoDouble⟨session,curlInfo.totalTime,⟨0.0⟩⟩
-  ("Error retrieving request time: "∾•Fmt rtime)!rtime=0
-
-  Fclose filePtr
-  Fclose headerFilePtr
-  content←•file.Bytes filename
-  responseHeaders←•file.Chars headerFilename
-
-  •file.Remove filename
-  •file.Remove headerFilename
-
+  response←session ReadResponse d
   EasyCleanup session
-
-  {
-    code⇐code,
-    time⇐time,
-    headers⇐responseHeaders,
-    content⇐content,
-  }
+  response
 }
