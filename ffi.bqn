@@ -59,6 +59,7 @@ options←{
   httpget⇐80
 
   # long integer options
+  postfieldsize⇐60  # size of the POST input data
   timeout⇐78  # timeout in seconds
   timeoutms⇐155  # timeout in milliseconds
 
@@ -68,11 +69,12 @@ options←{
   useragent⇐strOffset+18
 
   # pointer options
-  writedata⇐ptrOffset+1
-  headerdata⇐ptrOffset+29
+  writedata⇐ptrOffset+1  # FILE* in which to write response content
+  postfields⇐ptrOffset+15  # pointer to POST input data
+  headerdata⇐ptrOffset+29  # FILE* in which to write response headers
 
   # linked list options
-  httpHeader⇐slistOffset+23
+  httpHeader⇐slistOffset+23  # HTTP headers as a list of strings
 }
 
 

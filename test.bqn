@@ -1,7 +1,6 @@
-⟨Get⟩←•Import"curl.bqn"
+⟨Get,Post⟩←•Import"curl.bqn"
 
-r←⟨"Hello: World","Blabla: Blublu"⟩Get"http://httpbin.org/get?key=value"
+r←⟨"Content-Type: application/json"⟩Post"http://localhost:8080/post"‿"{""key"": ""value""}"
 r.code
 r.headers
 r.content
-r.time

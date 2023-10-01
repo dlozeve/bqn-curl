@@ -1,4 +1,4 @@
-⟨Get⟩⇐
+⟨Get,Post⟩⇐
 
 ⟨
   easyInit,
@@ -40,6 +40,67 @@ headers 𝕊 url:
   ("Error setting header file target: "∾•Fmt rheaderfile)!rheaderfile=0
   rredirect←EasySetoptLong⟨session,options.followlocation,1⟩
   ("Error setting redirect option: "∾•Fmt rredirect)!rredirect=0
+  # EasySetoptLong⟨session,options.header,1⟩
+  # EasySetoptLong⟨session,options.verbose,1⟩
+
+  slist←(8↑0){SlistAppend⟨𝕩,𝕨∾@⟩}´headers
+  rheaders←EasySetoptPtr⟨session,options.httpHeader,slist⟩
+  ("Error setting headers: "∾•Fmt rheaders)!rheaders=0
+
+  rperform←EasyPerform⟨session⟩
+  ("Error performing request: "∾•Fmt rperform)!rperform=0
+
+  SlistFreeAll slist
+
+  rcode‿⟨code⟩←EasyGetinfoLong⟨session,info.responseCode,⟨0⟩⟩
+  ("Error retrieving response code: "∾•Fmt rcode)!rcode=0
+  # ("Request failed with status code "∾•Fmt code)!2=⌊code÷100
+  rtime‿⟨time⟩←EasyGetinfoDouble⟨session,info.totalTime,⟨0.0⟩⟩
+  ("Error retrieving request time: "∾•Fmt rtime)!rtime=0
+
+  Fclose filePtr
+  Fclose headerFilePtr
+  content←•file.Bytes filename
+  responseHeaders←•file.Chars headerFilename
+
+  •file.Remove filename
+  EasyCleanup session
+  {
+    code⇐code,
+    time⇐time,
+    headers⇐responseHeaders,
+    content⇐content,
+  }
+}
+
+
+Post←{
+𝕊 url‿data: ⟨⟩ 𝕊 url‿data ;
+headers 𝕊 url‿data:
+  id←RandID 32
+  filename←"/tmp/bqncurl."∾id
+  filePtr←Fopen⟨filename∾@,"w+"⟩
+  headerFilename←"/tmp/bqncurl.header."∾id
+  headerFilePtr←Fopen⟨headerFilename∾@,"w+"⟩
+
+  session←EasyInit⟨⟩
+
+  ruseragent←EasySetoptStr⟨session,options.useragent,"curl/bqn"∾@⟩
+  ("Error setting user agent: "∾•Fmt ruseragent)!ruseragent=0
+  rurl←EasySetoptStr⟨session,options.url,url∾@⟩
+  ("Error setting URL: "∾•Fmt rurl)!rurl=0
+  rfile←EasySetoptPtr⟨session,options.writedata,filePtr⟩
+  ("Error setting file target: "∾•Fmt rfile)!rfile=0
+  rheaderfile←EasySetoptPtr⟨session,options.headerdata,headerFilePtr⟩
+  ("Error setting header file target: "∾•Fmt rheaderfile)!rheaderfile=0
+  rredirect←EasySetoptLong⟨session,options.followlocation,1⟩
+  ("Error setting redirect option: "∾•Fmt rredirect)!rredirect=0
+  rpost←EasySetoptLong⟨session,options.post,1⟩
+  ("Error setting up POST request: "∾•Fmt rpost)!rpost=0
+  rpostfields←EasySetoptStr⟨session,options.postfields,data⟩
+  ("Error setting POST data: "∾•Fmt rpostfields)!rpostfields=0
+  rpostfieldsize←EasySetoptLong⟨session,options.postfieldsize,≠data⟩
+  ("Error setting POST data size: "∾•Fmt rpostfieldsize)!rpostfieldsize=0
   # EasySetoptLong⟨session,options.header,1⟩
   # EasySetoptLong⟨session,options.verbose,1⟩
 
