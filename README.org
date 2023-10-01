@@ -38,3 +38,12 @@ The response object is a namespace with the following elements:
 
 If your endpoint returns text, you can use ~FromBytes~ from
 [[https://github.com/mlochbaum/bqn-libs/blob/master/strings.bqn][bqn-libs/strings.bqn]] to decode UTF-8.
+
+** Tests
+
+Run a local [[https://httpbin.org/][httpbin.org]] instance with Docker:
+#+begin_src sh
+docker run -p 8080:80 kennethreitz/httpbin
+#+end_src
+
+The tests can be run with =bqn tests.bqn=.
