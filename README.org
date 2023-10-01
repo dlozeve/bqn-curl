@@ -1,0 +1,40 @@
+* BQN HTTP library
+
+FFI bindings to [[https://curl.se/libcurl/][libcurl]] for [[https://mlochbaum.github.io/BQN/][BQN]].
+
+** Making requests
+
+Only GET and POST requests are implemented at this time.
+
+#+begin_src bqn
+⟨Get,Post⟩←•Import"curl.bqn"
+#+end_src
+
+Simple GET requests:
+#+begin_src bqn
+r←Get"https://httpbin.org/get"
+#+end_src
+
+You can pass headers as a left argument:
+#+begin_src bqn
+r←⟨"Content-Type: application/json"⟩Get"https://httpbin.org/get"
+#+end_src
+
+Arguments, port number, etc, can be included in the URL.
+
+For POST requests, pass data as an additional string parameter. It
+will not be converted or encoded in any way.
+#+begin_src bqn
+r←⟨"Content-Type: application/json"⟩Post"https://httpbin.org/post"‿"{""key"": ""value""}"
+#+end_src
+
+** Response objects
+
+The response object is a namespace with the following elements:
+- ~code~: the response code.
+- ~headers~: the response headers as a single string, separated by newlines.
+- ~content~: the response content, as raw bytes.
+- ~time~: the time the request took, in seconds.
+
+If your endpoint returns text, you can use ~FromBytes~ from
+[[https://github.com/mlochbaum/bqn-libs/blob/master/strings.bqn][bqn-libs/strings.bqn]] to decode UTF-8.
