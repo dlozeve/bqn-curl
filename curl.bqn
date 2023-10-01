@@ -19,6 +19,11 @@
 ⟩←•Import"ffi.bqn"
 ⟨RandID⟩←•Import"utils.bqn"
 
+Check←{
+  msg←"Curl: "∾𝕨∾" ("∾(•Fmt 𝕩)∾")"
+  msg ! 𝕩=0
+}
+
 PrepareRequest←{session 𝕊 url‿headers:
   id←RandID 32
   filename←"/tmp/bqncurl."∾id
@@ -26,22 +31,14 @@ PrepareRequest←{session 𝕊 url‿headers:
   headerFilename←"/tmp/bqncurl.header."∾id
   headerFilePtr←Fopen⟨headerFilename∾@,"w+"⟩
 
-  ruseragent←EasySetoptStr⟨session,curlOptions.useragent,"curl/bqn"∾@⟩
-  ("Error setting user agent: "∾•Fmt ruseragent)!ruseragent=0
-  rurl←EasySetoptStr⟨session,curlOptions.url,url∾@⟩
-  ("Error setting URL: "∾•Fmt rurl)!rurl=0
-  rfile←EasySetoptPtr⟨session,curlOptions.writedata,filePtr⟩
-  ("Error setting file target: "∾•Fmt rfile)!rfile=0
-  rheaderfile←EasySetoptPtr⟨session,curlOptions.headerdata,headerFilePtr⟩
-  ("Error setting header file target: "∾•Fmt rheaderfile)!rheaderfile=0
-  rredirect←EasySetoptLong⟨session,curlOptions.followlocation,1⟩
-  ("Error setting redirect option: "∾•Fmt rredirect)!rredirect=0
-  # EasySetoptLong⟨session,curlOptions.header,1⟩
-  # EasySetoptLong⟨session,curlOptions.verbose,1⟩
-
+  "setting user agent"Check EasySetoptStr⟨session,curlOptions.useragent,"curl/bqn"∾@⟩
+  "setting URL"Check EasySetoptStr⟨session,curlOptions.url,url∾@⟩
+  "setting file target"Check EasySetoptPtr⟨session,curlOptions.writedata,filePtr⟩
+  "setting header file target"Check EasySetoptPtr⟨session,curlOptions.headerdata,headerFilePtr⟩
+  "setting redirect option"Check EasySetoptLong⟨session,curlOptions.followlocation,1⟩
+  # "setting verbosity"Check EasySetoptLong⟨session,curlOptions.verbose,1⟩
   slist←(8↑0){SlistAppend⟨𝕩,𝕨∾@⟩}´headers
-  rheaders←EasySetoptPtr⟨session,curlOptions.httpHeader,slist⟩
-  ("Error setting headers: "∾•Fmt rheaders)!rheaders=0
+  "setting headers"Check rheaders←EasySetoptPtr⟨session,curlOptions.httpHeader,slist⟩
 
   slist‿filename‿filePtr‿headerFilename‿headerFilePtr
 }
@@ -50,9 +47,9 @@ ReadResponse←{session 𝕊 slist‿filename‿filePtr‿headerFilename‿heade
   SlistFreeAll slist
 
   rcode‿⟨code⟩←EasyGetinfoLong⟨session,curlInfo.responseCode,⟨0⟩⟩
-  ("Error retrieving response code: "∾•Fmt rcode)!rcode=0
+  "retrieving response code"Check rcode
   rtime‿⟨time⟩←EasyGetinfoDouble⟨session,curlInfo.totalTime,⟨0.0⟩⟩
-  ("Error retrieving request time: "∾•Fmt rtime)!rtime=0
+  "retrieving request time"Check rtime
 
   Fclose filePtr
   Fclose headerFilePtr
@@ -77,8 +74,7 @@ headers 𝕊 url:
   session←EasyInit⟨⟩
   d←session PrepareRequest url‿headers
 
-  rperform←EasyPerform⟨session⟩
-  ("Error performing request: "∾•Fmt rperform)!rperform=0
+  "performing request"Check EasyPerform⟨session⟩
 
   response←session ReadResponse d
   EasyCleanup session
@@ -90,15 +86,11 @@ Post←{
 headers 𝕊 url‿data:
   session←EasyInit⟨⟩
   d←session PrepareRequest url‿headers
-  rpost←EasySetoptLong⟨session,curlOptions.post,1⟩
-  ("Error setting up POST request: "∾•Fmt rpost)!rpost=0
-  rpostfields←EasySetoptStr⟨session,curlOptions.postfields,data⟩
-  ("Error setting POST data: "∾•Fmt rpostfields)!rpostfields=0
-  rpostfieldsize←EasySetoptLong⟨session,curlOptions.postfieldsize,≠data⟩
-  ("Error setting POST data size: "∾•Fmt rpostfieldsize)!rpostfieldsize=0
+  "setting up POST request"Check EasySetoptLong⟨session,curlOptions.post,1⟩
+  "setting POST data"Check EasySetoptStr⟨session,curlOptions.postfields,data⟩
+  "setting POST data size"Check EasySetoptLong⟨session,curlOptions.postfieldsize,≠data⟩
 
-  rperform←EasyPerform⟨session⟩
-  ("Error performing request: "∾•Fmt rperform)!rperform=0
+  "performing request"Check EasyPerform⟨session⟩
 
   response←session ReadResponse d
   EasyCleanup session
