@@ -135,6 +135,8 @@ Perform←{𝕊 session:
 
   rcode‿⟨code⟩←EasyGetinfoLong⟨session.sessionPtr,curlInfo.responseCode,⟨0⟩⟩
   "retrieving response code"Check rcode
+  rredirectcount‿⟨redirectCount⟩←EasyGetinfoLong⟨session.sessionPtr,curlInfo.redirectCount,⟨0⟩⟩
+  "retrieving redirect count"Check rredirectcount
   rtime‿⟨time⟩←EasyGetinfoDouble⟨session.sessionPtr,curlInfo.totalTime,⟨0.0⟩⟩
   "retrieving request time"Check rtime
 
@@ -149,8 +151,9 @@ Perform←{𝕊 session:
 
   {
     code⇐code,
-    time⇐time,
     headers⇐responseHeaders,
     content⇐content,
+    time⇐time,
+    redirectCount⇐redirectCount,
   }
 }

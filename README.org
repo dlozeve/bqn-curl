@@ -41,6 +41,7 @@ The response object is a namespace with the following elements:
 - ~headers~: the response headers as a single string, separated by newlines.
 - ~content~: the response content, as raw bytes.
 - ~time~: the time the request took, in seconds.
+- ~redirectCount~: the number of redirects.
 
 If your endpoint returns text, you can use ~FromBytes~ from
 [[https://github.com/mlochbaum/bqn-libs/blob/master/strings.bqn][bqn-libs/strings.bqn]] to decode UTF-8.
