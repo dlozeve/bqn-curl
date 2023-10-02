@@ -1,6 +1,7 @@
 ⟨
   easyInit,
   easyCleanup,
+  easyReset,
   easySetoptStr,
   easySetoptPtr,
   easySetoptLong,
@@ -28,6 +29,7 @@ curlCode←"i32"
 
 easyInit←CurlFFI curlPtr‿"curl_easy_init"
 easyCleanup←CurlFFI ""‿"curl_easy_cleanup"‿(">"∾curlPtr)
+easyReset←CurlFFI ""‿"curl_easy_reset"‿(">"∾curlPtr)
 
 easySetoptStr←CurlFFI curlCode‿"curl_easy_setopt"‿curlPtr‿curlOption‿"*u8:c8"
 easySetoptPtr←CurlFFI curlCode‿"curl_easy_setopt"‿curlPtr‿curlOption‿"*:i8"

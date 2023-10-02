@@ -1,8 +1,16 @@
-⟨Get,Post⟩⇐
+⟨
+  # Simple API
+  Get,Post,
+  # Advanced API
+  OpenSession,ResetSession,CloseSession,  # session management
+  SetURL,SetHeaders,SetVerbose,SetTimeout,SetTimeoutms,SetPost,SetData,  # request parameters
+  Perform,  # perform request
+⟩⇐
 
 ⟨
   easyInit,
   easyCleanup,
+  easyReset,
   easySetoptStr,
   easySetoptPtr,
   easySetoptLong,
@@ -19,36 +27,116 @@
 ⟩←•Import"ffi.bqn"
 ⟨RandID⟩←•Import"utils.bqn"
 
+# Simple GET request, with optional headers as left argument
+Get←{
+𝕊 url: ⟨⟩ 𝕊 url ;
+headers 𝕊 url:
+  session←OpenSession @
+  r←Perform headers SetHeaders url SetURL session
+  CloseSession session
+  r
+}
+
+# Simple POST request, with optional headers as left argument
+Post←{
+𝕊 url‿data: ⟨⟩ 𝕊 url‿data ;
+headers 𝕊 url‿data:
+  session←OpenSession @
+  r←Perform data SetData SetPost headers SetHeaders url SetURL session
+  CloseSession session
+  r
+}
+
+# Raise an error if the return code 𝕩 is not 0, with custom message 𝕨
 Check←{
   msg←"Curl: "∾𝕨∾" ("∾(•Fmt 𝕩)∾")"
   msg ! 𝕩=0
 }
 
-PrepareRequest←{session 𝕊 url‿headers:
+# Create a libcurl session, with default values for user-agent and redirects
+OpenSession←{𝕊𝕩:
+  sessionPtr←EasyInit⟨⟩
+  "setting user agent"Check EasySetoptStr⟨sessionPtr,curlOptions.useragent,"curl/bqn"∾@⟩
+  "setting redirect option"Check EasySetoptLong⟨sessionPtr,curlOptions.followlocation,1⟩
+  {sessionPtr⇐sessionPtr,headersSlist⇐8↑0}
+}
+
+# Reset a libcurl session to default parameters, as if just created by
+# OpenSession, but preserving open connections and caches
+ResetSession←{𝕊 session:
+  SlistFreeAll session.headersSlist
+  "resetting session"Check EasyReset session.sessionPtr
+  "setting user agent"Check EasySetoptStr⟨session.sessionPtr,curlOptions.useragent,"curl/bqn"∾@⟩
+  "setting redirect option"Check EasySetoptLong⟨session.sessionPtr,curlOptions.followlocation,1⟩
+  {sessionPtr⇐session.sessionPtr,headersSlist⇐8↑0}
+}
+
+# Close a libcurl session, freeing memory
+CloseSession←{𝕊 session:
+  SlistFreeAll session.headersSlist
+  EasyCleanup session.sessionPtr
+  @
+}
+
+# Set URL for the next request
+SetURL←{url 𝕊 session:
+  "setting URL"Check EasySetoptStr⟨session.sessionPtr,curlOptions.url,url∾@⟩
+  session
+}
+
+# Set headers for the next request, as a list of strings
+SetHeaders←{headers 𝕊 session:
+  slist←session.headersSlist{SlistAppend⟨𝕩,𝕨∾@⟩}´headers
+  "setting headers"Check rheaders←EasySetoptPtr⟨session.sessionPtr,curlOptions.httpHeader,slist⟩
+  {sessionPtr⇐session.sessionPtr,headersSlist⇐slist}
+}
+
+# Set the next request as verbose (logging to standard output)
+SetVerbose←{𝕊 session:
+  "setting verbose option"Check EasySetoptLong⟨session.sessionPtr,curlOptions.verbose,1⟩
+  session
+}
+
+# Set timeout in seconds for the next request
+SetTimeout←{timeout 𝕊 session:
+  "setting timeout"Check EasySetoptLong⟨session.sessionPtr,curlOptions.timeout,timeout⟩
+  session
+}
+
+# Set timeout in milliseconds for the next request
+SetTimeoutms←{timeoutms 𝕊 session:
+  "setting timeout (ms)"Check EasySetoptLong⟨session.sessionPtr,curlOptions.timeoutms,timeoutms⟩
+  session
+}
+
+# Use a POST method for the next request
+SetPost←{𝕊 session:
+  "setting up POST request"Check EasySetoptLong⟨session.sessionPtr,curlOptions.post,1⟩
+  session
+}
+
+# Set data to post
+SetData←{data 𝕊 session:
+  "setting POST data"Check EasySetoptStr⟨session.sessionPtr,curlOptions.postfields,data⟩
+  "setting POST data size"Check EasySetoptLong⟨session.sessionPtr,curlOptions.postfieldsize,≠data⟩
+  session
+}
+
+# Perform a request and get response in a namespace
+Perform←{𝕊 session:
   id←RandID 32
   filename←"/tmp/bqncurl."∾id
   filePtr←Fopen⟨filename∾@,"w+"⟩
   headerFilename←"/tmp/bqncurl.header."∾id
   headerFilePtr←Fopen⟨headerFilename∾@,"w+"⟩
+  "setting response file target"Check EasySetoptPtr⟨session.sessionPtr,curlOptions.writedata,filePtr⟩
+  "setting header file target"Check EasySetoptPtr⟨session.sessionPtr,curlOptions.headerdata,headerFilePtr⟩
 
-  "setting user agent"Check EasySetoptStr⟨session,curlOptions.useragent,"curl/bqn"∾@⟩
-  "setting URL"Check EasySetoptStr⟨session,curlOptions.url,url∾@⟩
-  "setting file target"Check EasySetoptPtr⟨session,curlOptions.writedata,filePtr⟩
-  "setting header file target"Check EasySetoptPtr⟨session,curlOptions.headerdata,headerFilePtr⟩
-  "setting redirect option"Check EasySetoptLong⟨session,curlOptions.followlocation,1⟩
-  # "setting verbosity"Check EasySetoptLong⟨session,curlOptions.verbose,1⟩
-  slist←(8↑0){SlistAppend⟨𝕩,𝕨∾@⟩}´headers
-  "setting headers"Check rheaders←EasySetoptPtr⟨session,curlOptions.httpHeader,slist⟩
+  "performing request"Check EasyPerform⟨session.sessionPtr⟩
 
-  slist‿filename‿filePtr‿headerFilename‿headerFilePtr
-}
-
-ReadResponse←{session 𝕊 slist‿filename‿filePtr‿headerFilename‿headerFilePtr:
-  SlistFreeAll slist
-
-  rcode‿⟨code⟩←EasyGetinfoLong⟨session,curlInfo.responseCode,⟨0⟩⟩
+  rcode‿⟨code⟩←EasyGetinfoLong⟨session.sessionPtr,curlInfo.responseCode,⟨0⟩⟩
   "retrieving response code"Check rcode
-  rtime‿⟨time⟩←EasyGetinfoDouble⟨session,curlInfo.totalTime,⟨0.0⟩⟩
+  rtime‿⟨time⟩←EasyGetinfoDouble⟨session.sessionPtr,curlInfo.totalTime,⟨0.0⟩⟩
   "retrieving request time"Check rtime
 
   Fclose filePtr
@@ -66,33 +154,4 @@ ReadResponse←{session 𝕊 slist‿filename‿filePtr‿headerFilename‿heade
     headers⇐responseHeaders,
     content⇐content,
   }
-}
-
-Get←{
-𝕊 url: ⟨⟩ 𝕊 url ;
-headers 𝕊 url:
-  session←EasyInit⟨⟩
-  d←session PrepareRequest url‿headers
-
-  "performing request"Check EasyPerform⟨session⟩
-
-  response←session ReadResponse d
-  EasyCleanup session
-  response
-}
-
-Post←{
-𝕊 url‿data: ⟨⟩ 𝕊 url‿data ;
-headers 𝕊 url‿data:
-  session←EasyInit⟨⟩
-  d←session PrepareRequest url‿headers
-  "setting up POST request"Check EasySetoptLong⟨session,curlOptions.post,1⟩
-  "setting POST data"Check EasySetoptStr⟨session,curlOptions.postfields,data⟩
-  "setting POST data size"Check EasySetoptLong⟨session,curlOptions.postfieldsize,≠data⟩
-
-  "performing request"Check EasyPerform⟨session⟩
-
-  response←session ReadResponse d
-  EasyCleanup session
-  response
 }
