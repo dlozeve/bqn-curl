@@ -58,7 +58,9 @@ OpenSession←{𝕊𝕩:
   sessionPtr←EasyInit⟨⟩
   "setting user agent"Check EasySetoptStr⟨sessionPtr,curlOptions.useragent,"curl/bqn"∾@⟩
   "setting redirect option"Check EasySetoptLong⟨sessionPtr,curlOptions.followlocation,1⟩
-  {sessionPtr⇐sessionPtr,headersSlist⇐8↑0}
+  slist←SlistAppend⟨8↑0,""⟩
+  "creating slist" ! slist≢8↑0
+  {sessionPtr⇐sessionPtr,headersSlist⇐slist}
 }
 
 # Reset a libcurl session to default parameters, as if just created by
@@ -68,7 +70,9 @@ ResetSession←{𝕊 session:
   "resetting session"Check EasyReset session.sessionPtr
   "setting user agent"Check EasySetoptStr⟨session.sessionPtr,curlOptions.useragent,"curl/bqn"∾@⟩
   "setting redirect option"Check EasySetoptLong⟨session.sessionPtr,curlOptions.followlocation,1⟩
-  {sessionPtr⇐session.sessionPtr,headersSlist⇐8↑0}
+  slist←SlistAppend⟨8↑0,""⟩
+  "creating slist" ! slist≢8↑0
+  {sessionPtr⇐session.sessionPtr,headersSlist⇐slist}
 }
 
 # Close a libcurl session, freeing memory
@@ -88,7 +92,7 @@ SetURL←{url 𝕊 session:
 SetHeaders←{headers 𝕊 session:
   slist←session.headersSlist{SlistAppend⟨𝕩,𝕨∾@⟩}´headers
   "setting headers"Check rheaders←EasySetoptPtr⟨session.sessionPtr,curlOptions.httpHeader,slist⟩
-  {sessionPtr⇐session.sessionPtr,headersSlist⇐slist}
+  session
 }
 
 # Set the next request as verbose (logging to standard output)
