@@ -6,7 +6,9 @@ FFI bindings to [[https://curl.se/libcurl/][libcurl]] for [[https://mlochbaum.gi
 
 Set the location of the =libcurl.so= library in [[./config.bqn][config.bqn]].
 
-** Making requests
+** Usage
+
+*** Simple API
 
 Only GET and POST requests are implemented at this time.
 
@@ -32,7 +34,7 @@ will not be converted or encoded in any way.
 r←⟨"Content-Type: application/json"⟩Post"https://httpbin.org/post"‿"{""key"": ""value""}"
 #+end_src
 
-** Response objects
+*** Response objects
 
 The response object is a namespace with the following elements:
 - ~code~: the response code.
@@ -43,7 +45,53 @@ The response object is a namespace with the following elements:
 If your endpoint returns text, you can use ~FromBytes~ from
 [[https://github.com/mlochbaum/bqn-libs/blob/master/strings.bqn][bqn-libs/strings.bqn]] to decode UTF-8.
 
-** Tests
+*** Advanced API
+
+For more fine-grained control on request parameters, you can use the
+advanced API, which closely mirrors the libcurl API structure.
+
+A session object is created with ~OpenSession~, and can be reused to
+speed up successive requests by reusing an existing connection.
+
+Create a request by modifying the session object. Each of the
+functions take the session as their right argument, and configuration
+data as their left argument. They modify the session in-place, but
+also return it so that they can be chained easily.
+
+- ~url SetURL session~: the request URL.
+- ~headers SetHeaders session~: the request headers, as a list of strings.
+- ~SetVerbose session~: log verbose request data to standard output.
+- ~n SetTimeout session~ and ~n SetTimeoutms timeout~: the request timeout, in seconds or in milliseconds.
+- ~SetPost session~ and ~data SetData session~: use a POST request and set the data to send, as a string.
+
+Finally, perform the actual request with ~Perform~, returning the
+response object as above.
+
+The session object can then be reused for subsequent requests,
+modifying request parameters as needed. It can be reset to its default
+configuration using ~ResetSession~, while preserving open connections
+and caches.
+
+A session is terminated, and its memory freed, with ~CloseSession~.
+
+Full example:
+#+begin_src bqn
+⟨
+  OpenSession,CloseSession,
+  SetURL,SetHeaders,SetTimeoutms,
+  Perform,
+⟩←•Import"curl.bqn"
+
+session←⟨"User-Agent: myapp"⟩SetHeaders OpenSession @
+r1←Perform "https://httpbin.org/status/418"SetURL session
+•Show r1.code
+r2←Perform 500 SetTimeoutms "https://httpbin.org/ip"SetURL session
+•Out r2.content
+
+CloseSession session
+#+end_src
+
+** Running tests
 
 Run a local [[https://httpbin.org/][httpbin.org]] instance with Docker:
 #+begin_src sh
