@@ -3,7 +3,7 @@
   Get,Post,
   # Advanced API
   OpenSession,ResetSession,CloseSession,  # session management
-  SetURL,SetHeaders,SetVerbose,SetTimeout,SetTimeoutms,SetPost,SetData,  # request parameters
+  SetURL,SetHeaders,SetVerbose,SetTimeout,SetTimeoutms,SetData,  # request parameters
   Perform,  # perform request
 ⟩⇐
 
@@ -42,7 +42,7 @@ Post←{
 𝕊 url‿data: ⟨⟩ 𝕊 url‿data ;
 headers 𝕊 url‿data:
   session←OpenSession @
-  r←Perform data SetData SetPost headers SetHeaders url SetURL session
+  r←Perform data SetData headers SetHeaders url SetURL session
   CloseSession session
   r
 }
@@ -113,14 +113,9 @@ SetTimeoutms←{timeoutms 𝕊 session:
   session
 }
 
-# Use a POST method for the next request
-SetPost←{𝕊 session:
-  "setting up POST request"Check EasySetoptLong⟨session.sessionPtr,curlOptions.post,1⟩
-  session
-}
-
-# Set data to post
+# Use a POST method and set data to post
 SetData←{data 𝕊 session:
+  "setting up POST request"Check EasySetoptLong⟨session.sessionPtr,curlOptions.post,1⟩
   "setting POST data"Check EasySetoptStr⟨session.sessionPtr,curlOptions.postfields,data⟩
   "setting POST data size"Check EasySetoptLong⟨session.sessionPtr,curlOptions.postfieldsize,≠data⟩
   session

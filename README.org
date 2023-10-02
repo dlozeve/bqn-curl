@@ -62,7 +62,7 @@ also return it so that they can be chained easily.
 - ~headers SetHeaders session~: the request headers, as a list of strings.
 - ~SetVerbose session~: log verbose request data to standard output.
 - ~n SetTimeout session~ and ~n SetTimeoutms timeout~: the request timeout, in seconds or in milliseconds.
-- ~SetPost session~ and ~data SetData session~: use a POST request and set the data to send, as a string.
+- ~data SetData session~: use a POST request and set the data to send, as a string.
 
 Finally, perform the actual request with ~Perform~, returning the
 response object as above.
