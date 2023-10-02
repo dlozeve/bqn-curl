@@ -67,7 +67,7 @@ OpenSession←{𝕊𝕩:
 # OpenSession, but preserving open connections and caches
 ResetSession←{𝕊 session:
   SlistFreeAll session.headersSlist
-  "resetting session"Check EasyReset session.sessionPtr
+  EasyReset session.sessionPtr
   "setting user agent"Check EasySetoptStr⟨session.sessionPtr,curlOptions.useragent,"curl/bqn"∾@⟩
   "setting redirect option"Check EasySetoptLong⟨session.sessionPtr,curlOptions.followlocation,1⟩
   slist←SlistAppend⟨8↑0,""⟩
