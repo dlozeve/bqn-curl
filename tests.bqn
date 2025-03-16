@@ -43,7 +43,7 @@ simpleAPI_testsuite←⟨
     ! 1=+´"Content-Type: "⍷r.headers
     ! 1=+´"Content-Length: "⍷r.headers
     ! 1=+´"""Content-Type"": ""application/json"""⍷r.content
-    ! 1=+´"""data"": ""{\""key\"": \""value\""}"""⍷r.content
+    ! 1=+´"""data"": ""{\""key\"": 1}"""⍷ r.content
   }
 ⟩
 
