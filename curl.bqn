@@ -116,8 +116,8 @@ SetTimeoutms←{timeoutms 𝕊 session:
 # Use a POST method and set data to post
 SetData←{data 𝕊 session:
   "setting up POST request"Check EasySetoptLong⟨session.sessionPtr,curlOptions.post,1⟩
-  "setting POST data"Check EasySetoptStr⟨session.sessionPtr,curlOptions.postfields,data⟩
   "setting POST data size"Check EasySetoptLong⟨session.sessionPtr,curlOptions.postfieldsize,≠data⟩
+  "copying POST data"Check EasySetoptStr⟨session.sessionPtr,curlOptions.copypostfields,data⟩
   session
 }
 

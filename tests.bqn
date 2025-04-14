@@ -36,14 +36,14 @@ simpleAPI_testsuite←⟨
   },
   "simple POST with headers"‿{𝕊𝕩:
     headers←⟨"Content-Type: application/json"⟩
-    r←headers Post ⟨httpbinURL∾"/post","{""key"": ""value""}"⟩
+    r←headers Post ⟨httpbinURL∾"/post",¯1000 + 1000 + "{""key"": 1}"⟩
     ! 200=r.code
     ! 0=r.redirectCount
     ! 1=⊑"HTTP/"⍷r.headers
     ! 1=+´"Content-Type: "⍷r.headers
     ! 1=+´"Content-Length: "⍷r.headers
     ! 1=+´"""Content-Type"": ""application/json"""⍷r.content
-    ! 1=+´"""data"": ""{\""key\"": \""value\""}"""⍷r.content
+    ! 1=+´"""data"": ""{\""key\"": 1}"""⍷ r.content
   }
 ⟩
 

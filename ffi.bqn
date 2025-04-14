@@ -74,6 +74,7 @@ curlOptions←{
   writedata⇐ptrOffset+1  # FILE* in which to write response content
   postfields⇐ptrOffset+15  # pointer to POST input data
   headerdata⇐ptrOffset+29  # FILE* in which to write response headers
+  copypostfields⇐ptrOffset+165 # copy POST input data
 
   # linked list options
   httpHeader⇐slistOffset+23  # HTTP headers as a list of strings
