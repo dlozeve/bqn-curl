@@ -1,10 +1,11 @@
 * BQN HTTP library
 
 FFI bindings to [[https://curl.se/libcurl/][libcurl]] for [[https://mlochbaum.github.io/BQN/][BQN]].
+Requires CBQN >= 0.12.
 
 ** Configuration
 
-Set the location of the =libcurl.so= library in [[./config.bqn][config.bqn]].
+If =libcurl.so= isn't automatically found, set the location manually in [[./config.bqn][config.bqn]].
 
 ** Usage
 

@@ -58,7 +58,7 @@ OpenSession←{𝕊𝕩:
   sessionPtr←EasyInit⟨⟩
   "setting user agent"Check EasySetoptStr⟨sessionPtr,curlOptions.useragent,"curl/bqn"∾@⟩
   "setting redirect option"Check EasySetoptLong⟨sessionPtr,curlOptions.followlocation,1⟩
-  slist←SlistAppend⟨8↑0,""⟩
+  slist←SlistAppend⟨8↑0,⥊@⟩
   "creating slist" ! slist≢8↑0
   {sessionPtr⇐sessionPtr,headersSlist⇐slist}
 }
@@ -70,7 +70,7 @@ ResetSession←{𝕊 session:
   EasyReset session.sessionPtr
   "setting user agent"Check EasySetoptStr⟨session.sessionPtr,curlOptions.useragent,"curl/bqn"∾@⟩
   "setting redirect option"Check EasySetoptLong⟨session.sessionPtr,curlOptions.followlocation,1⟩
-  slist←SlistAppend⟨8↑0,""⟩
+  slist←SlistAppend⟨8↑0,⥊@⟩
   "creating slist" ! slist≢8↑0
   {sessionPtr⇐session.sessionPtr,headersSlist⇐slist}
 }
@@ -125,9 +125,9 @@ SetData←{data 𝕊 session:
 Perform←{𝕊 session:
   id←RandID 32
   filename←"/tmp/bqncurl."∾id
-  filePtr←Fopen⟨filename∾@,"w+"⟩
+  filePtr←Fopen⟨filename∾@,"w+"∾@⟩
   headerFilename←"/tmp/bqncurl.header."∾id
-  headerFilePtr←Fopen⟨headerFilename∾@,"w+"⟩
+  headerFilePtr←Fopen⟨headerFilename∾@,"w+"∾@⟩
   "setting response file target"Check EasySetoptPtr⟨session.sessionPtr,curlOptions.writedata,filePtr⟩
   "setting header file target"Check EasySetoptPtr⟨session.sessionPtr,curlOptions.headerdata,headerFilePtr⟩
 
