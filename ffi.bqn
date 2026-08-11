@@ -31,15 +31,15 @@ easyInit         ←CurlFFI⟨curlPtr,"curl_easy_init"⟩
 easyCleanup      ←CurlFFI⟨"","curl_easy_cleanup",">"∾curlPtr⟩
 easyReset        ←CurlFFI⟨"","curl_easy_reset",">"∾curlPtr⟩
 
-easySetoptStr    ←CurlFFI⟨curlCode,"curl_easy_setopt",curlPtr,curlOption,"*u8:c8"⟩
-easySetoptPtr    ←CurlFFI⟨curlCode,"curl_easy_setopt",curlPtr,curlOption,"*:i8"⟩
-easySetoptLong   ←CurlFFI⟨curlCode,"curl_easy_setopt",curlPtr,curlOption,"i32"⟩
+easySetoptStr    ←CurlFFI⟨curlCode,"curl_easy_setopt",curlPtr,curlOption,"...","*u8:c8"⟩
+easySetoptPtr    ←CurlFFI⟨curlCode,"curl_easy_setopt",curlPtr,curlOption,"...","*:i8"⟩
+easySetoptLong   ←CurlFFI⟨curlCode,"curl_easy_setopt",curlPtr,curlOption,"...","ilong"⟩
 
 easyPerform      ←CurlFFI⟨curlCode,"curl_easy_perform",curlPtr⟩
 
-easyGetinfoStr   ←CurlFFI⟨curlCode,"curl_easy_getinfo",curlPtr,curlOption,"&u8:c8"⟩
-easyGetinfoLong  ←CurlFFI⟨curlCode,"curl_easy_getinfo",curlPtr,curlOption,"&i32"⟩
-easyGetinfoDouble←CurlFFI⟨curlCode,"curl_easy_getinfo",curlPtr,curlOption,"&f64"⟩
+easyGetinfoStr   ←CurlFFI⟨curlCode,"curl_easy_getinfo",curlPtr,curlOption,"...","&u8:c8"⟩
+easyGetinfoLong  ←CurlFFI⟨curlCode,"curl_easy_getinfo",curlPtr,curlOption,"...","&ilong"⟩
+easyGetinfoDouble←CurlFFI⟨curlCode,"curl_easy_getinfo",curlPtr,curlOption,"...","&f64"⟩
 
 slistAppend      ←CurlFFI⟨"*:i8","curl_slist_append","*:i8","*u8:c8"⟩
 slistFreeAll     ←CurlFFI⟨"","curl_slist_free_all",">*:i8"⟩
